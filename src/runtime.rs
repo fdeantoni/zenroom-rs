@@ -85,19 +85,27 @@ fn execute_zen(conf: CString, script: CString, data: CString, keys: CString) -> 
             res.trim_matches(char::from(0)).to_string()
         });
 
-        stdout_output.and_then(|string| {
-            if string.is_empty() {
-                stderr_output
+        stdout_output
+            .map_err(|error| {
+                let msg = format!("Failed to convert stdout buffer to string. Reason: {}", error.to_string());
+                ZenError::new(msg)
+            })
+            .and_then(|string| {
+            if string.contains("traceback") || string.is_empty() {
+                match stderr_output {
+                    Ok(error) => Err(ZenError::new(error)),
+                    Err(error) => {
+                        let msg = format!("Failed to convert stderr buffer to string. Reason: {}", error.to_string());
+                        Err(ZenError::new(msg))
+                    }
+                }
             } else {
                 Ok(string)
             }
         })
     };
 
-    output.map_err(|error| {
-        let msg = format!("Failed to convert buffers to string. Reason: {}", error.to_string());
-        ZenError::new(msg)
-    })
+    output
 }
 
 #[cfg(test)]
