@@ -58,7 +58,7 @@ fn execute_zen(conf: CString, script: CString, data: CString, keys: CString) -> 
         std::mem::forget(stdout);
         std::mem::forget(stderr);
 
-        let _result = zencode_exec_tobuf(
+        let result = zencode_exec_tobuf(
             script.into_raw(),
             conf.into_raw(),
             keys.into_raw(),
@@ -85,23 +85,15 @@ fn execute_zen(conf: CString, script: CString, data: CString, keys: CString) -> 
             res.trim_matches(char::from(0)).to_string()
         });
 
-        stdout_output
-            .map_err(|error| {
-                let msg = format!("Failed to convert stdout buffer to string. Reason: {}", error.to_string());
-                ZenError::new(msg)
-            })
-            .and_then(|string| {
-            if string.contains("traceback") || string.is_empty() {
-                match stderr_output {
-                    Ok(error) => Err(ZenError::new(error)),
-                    Err(error) => {
-                        let msg = format!("Failed to convert stderr buffer to string. Reason: {}", error.to_string());
-                        Err(ZenError::new(msg))
-                    }
-                }
-            } else {
-                Ok(string)
-            }
+        let response = if result == 0 {
+            stdout_output
+        } else {
+            stderr_output
+        };
+
+        response.map_err(|error| {
+            let msg = format!("Failed to convert buffer to string. Reason: {}", error.to_string());
+            ZenError::new(msg)
         })
     };
 

@@ -4,9 +4,14 @@ use std::env;
 use std::path::PathBuf;
 
 fn main() {
+
+    dotenv::dotenv().ok();
+    let zenroom_dir = std::env::var("ZENROOM_DIR")
+        .unwrap_or(String::from("../Zenroom"));
+
     // Tell cargo to tell rustc to link the system bzip2
     // shared library.
-    println!("cargo:rustc-link-search=../Zenroom/build");
+    println!("cargo:rustc-link-search={}/build", zenroom_dir);
     println!("cargo:rustc-link-lib=static=zenroom");
 
     // Tell cargo to invalidate the built crate whenever the wrapper changes
@@ -20,7 +25,7 @@ fn main() {
         // bindings for.
         .header("wrapper.h")
         // Set the include path
-        .clang_arg("-I../Zenroom/src")
+        .clang_arg(format!("-I{}/src", zenroom_dir))
         // Tell cargo to invalidate the built crate whenever any of the
         // included header files changed.
         .parse_callbacks(Box::new(bindgen::CargoCallbacks))
