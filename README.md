@@ -39,7 +39,7 @@ Once cloned, make the Zenroom library. Here we will create the OSX static librar
     $ cd Zenroom
     $ make osx-lib
     
-Once the static library is created, go back to this project and build it:
+With the static library created, go back to this project and build it:
 
     $ cd ../zenroom-rs
     $ cargo build        
@@ -49,4 +49,6 @@ a different folder you can create a `.env` file with the following:
 
     ZENROOM_DIR=/path/to/your/zenroom/repo
     
-        
+# License #
+
+As Zenroom is licensed as AGPLv3, so is this project.        
