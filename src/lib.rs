@@ -30,12 +30,3 @@ impl std::fmt::Display for ZenError {
         f.write_str(&self.description)
     }
 }
-
-impl From<std::io::Error> for ZenError {
-    fn from(error: std::io::Error) -> Self {
-        ZenError::new(format!(
-            "IO error occurred! {}",
-            error.to_string()
-        ))
-    }
-}

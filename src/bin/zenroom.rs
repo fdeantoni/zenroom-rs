@@ -9,7 +9,7 @@ Given that I am known as 'Alice'
 When I create the keypair
 Then print all data"#);
     let rt = Runtime::new(String::new());
-    let output = rt.execute(script, Value::Null, Value::Null);
+    let output = rt.execute(script, Value::Null, Value::Null).unwrap();
 
-    println!("{:?}", output);
+    println!("{}", serde_json::to_string_pretty(&output).unwrap());
 }
